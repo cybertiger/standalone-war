@@ -1,4 +1,4 @@
-apply plugin: 'java'
+apply plugin: 'groovy'
 
 repositories {
 	mavenCentral()
@@ -6,4 +6,8 @@ repositories {
 
 dependencies {
 	compile group: 'org.mortbay.jetty', name: 'jetty-embedded', version: '6.1.21'
+
+	groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: '1.7.6'
+	testCompile	group: 'org.codehaus.geb', name: 'geb-spock', version: '0.5.1'
+	testCompile group: 'org.spockframework', name: 'spock-core',version:'0.5-groovy-1.7'
 }
