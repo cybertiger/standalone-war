@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 Qbranch AB
+ * Copyright 2011 Leonard Axelsson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package se.qbranch.standalone;
+package com.xlson.standalonewar;
 
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
