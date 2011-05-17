@@ -16,14 +16,19 @@
 
 apply plugin: 'java'
 
+configurations { 
+  standalone
+}
+
 repositories {
-	mavenCentral()
+  mavenCentral()
 }
 
 dependencies {
-	compile group: 'org.mortbay.jetty', name: 'jetty-embedded', version: '6.1.21'
-	compile group: 'org.mortbay.jetty', name: 'jetty-naming', version: '6.1.21'
-	compile group: 'org.mortbay.jetty', name: 'jetty-plus', version: '6.1.21'
+  standalone project(':starter')
+  standalone 'org.mortbay.jetty:jetty-embedded:6.1.21'
+  standalone 'org.mortbay.jetty:jetty-naming:6.1.21'
+  standalone 'org.mortbay.jetty:jetty-plus:6.1.21'
 }
 
 defaultTasks 'buildStandaloneWar'
@@ -32,44 +37,34 @@ def depsDir = file('build/dependencies')
 def outDir = file('build/out')
 def warDir = file('build/explodedWar')
 
-task extractDependencies << {
-  	for(file in configurations.runtime) {
-		ant.unzip(src: file.absolutePath,
-			      dest: depsDir)
-	}
+task extractDependencies(dependsOn: ':starter:jar') << {
+  for(file in configurations.standalone) {
+    ant.unzip(src: file.absolutePath,
+              dest: depsDir)
+  }
 	
-	ant.delete(dir: new File(depsDir, 'META-INF'))
+  ant.delete(dir: new File(depsDir, 'META-INF'))
 }
 
-task buildStarter(dependsOn: extractDependencies) << {
+task buildStandaloneWar(dependsOn: extractDependencies) << {
+  if(project.hasProperty('inWar') && !project.hasProperty('outWar')) {
+    def warName = inWar[0..(inWar.indexOf('.war')-1)]
+    outWar = "build/$warName-standalone.war"
+  }
 
-	outDir.mkdirs()
+  ant.unzip(src: inWar, dest: warDir)
 	
-	ant.javac(srcdir:'src', destdir: outDir,
-			  fork: 'true', classpath: depsDir)
-	
-}
+  copy {
+    from depsDir
+    from outDir
+    into warDir
+  }
 
-task buildStandaloneWar(dependsOn: buildStarter) << {
-    if(project.hasProperty('inWar') && !project.hasProperty('outWar')) {
-      def warName = inWar[0..(inWar.indexOf('.war')-1)]
+  ant.manifest(file: new File(warDir, 'META-INF/MANIFEST.MF')) {
+    attribute(name: 'Main-Class', value: 'com.xlson.standalonewar.Starter')
+  }
 
-      outWar = "build/$warName-standalone.war"
-    }
-
-	ant.unzip(src: inWar, dest: warDir)
-	
-	copy {
-    	from depsDir
-		from outDir
-		into warDir
-    }
-
-	ant.manifest(file: new File(warDir, 'META-INF/MANIFEST.MF')) {
-		attribute(name: 'Main-Class', value: 'com.xlson.standalonewar.Starter')
-	}
-
-	ant.zip(destfile: "$outWar") {
-		fileset(dir: warDir)
-	}
+  ant.zip(destfile: "$outWar") {
+    fileset(dir: warDir)
+  }
 }

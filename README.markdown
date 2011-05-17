@@ -34,7 +34,7 @@ Also, I can't do any magic with your war, if it doesn't work in Jetty or have an
 
 I'd like to break standalone-war out into 4 components as follows:
 
-1. A project for the starter source
+1. A project for the starter source [DONE]
 2. A Gradle plugin
-3. The old (non-plugin) Gradle build
+3. The old (non-plugin) Gradle build [DONE]
 4. A [Grails](http://grails.org/) plugin
