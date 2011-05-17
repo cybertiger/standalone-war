@@ -1,38 +1,9 @@
-apply plugin:com.smokejumperit.gradle.ExecPlugin
-
-buildscript {
-  repositories {
-    mavenRepo urls:'http://repo.smokejumperit.com'
-  }
-  dependencies {
-    classpath 'com.smokejumperit:gradle-plugins:0.6.8'
-  }
-}
-
-apply plugin: 'groovy'
+apply plugin: 'java'
 
 repositories {
 	mavenCentral()
 }
 
 dependencies {
-	compile group: 'org.mortbay.jetty', name: 'jetty-embedded', version: '6.1.21'
-
-	groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: '1.7.6'
-	testCompile	group: 'org.codehaus.geb', name: 'geb-spock', version: '0.5.1'
-	testCompile group: 'org.spockframework', name: 'spock-core',version:'0.5-groovy-1.7'
-}
-
-test.ignoreFailures = true
-
-test.doFirst {
-	println "Starting the war"
-	
-	def classpath = configurations.compile.collect{it}.join(':') + ":" + sourceSets.main.classesDir
-	use ant.java(classpath: classpath, classname: 'com.xlson.standalonewar.Starter')
-	println classpath
-}
-
-test.doLast {
-	println "After tests"
+	compile 'org.mortbay.jetty:jetty-embedded:6.1.21'
 }
