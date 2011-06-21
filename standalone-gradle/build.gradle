@@ -2,32 +2,27 @@ apply plugin: "war"
 apply plugin: StandaloneWarPlugin
 apply plugin: "groovy"
 
+configurations { 
+  standalone
+}
+
 repositories {
     mavenCentral()
 }
 
 dependencies { 
-  compile project(":starter")
+  standalone project(":starter")
   groovy localGroovy()
   compile group: 'commons-io', name: 'commons-io', version: '1.4'
   compile group: 'log4j', name: 'log4j', version: '1.2.15', ext: 'jar'
-  compile 'org.mortbay.jetty:jetty-embedded:6.1.21'
-  compile 'org.mortbay.jetty:jetty-naming:6.1.21'
-  compile 'org.mortbay.jetty:jetty-plus:6.1.21'
-  compile 'org.mortbay.jetty:jsp-2.1:6.1.10'
+  standalone 'org.mortbay.jetty:jetty-embedded:6.1.21'
+  standalone 'org.mortbay.jetty:jetty-naming:6.1.21'
+  standalone 'org.mortbay.jetty:jetty-plus:6.1.21'
+  standalone 'org.mortbay.jetty:jsp-2.1:6.1.14'
 
 }
 
 class StandaloneWarPlugin implements Plugin<Project> { 
-
-  def extractDependencies(Project project, depsDir) { 
-    for(file in project.configurations.compile) {
-      project.ant.unzip(src: file.absolutePath,
-                dest: depsDir)
-    }
-    project.ant.delete(dir: new File(depsDir, 'META-INF'))
-  }
-
 
   def void apply(Project project) {
     def warFile = project.war.archivePath
@@ -36,8 +31,8 @@ class StandaloneWarPlugin implements Plugin<Project> {
     def outDir = project.file('build/out')
     def warDir = project.file('build/explodedWar')
 
-    project.task('extractDependencies', dependsOn: ':starter:jar') << {
-      for(file in project.configurations.compile) {
+    project.task('extractDependencies', dependsOn: [':starter:jar', 'war']) << {
+      for(file in project.configurations.standalone) {
         project.ant.unzip(src: file.absolutePath,
                   dest: depsDir)
       }
@@ -45,7 +40,9 @@ class StandaloneWarPlugin implements Plugin<Project> {
       project.ant.delete(dir: new File(depsDir, 'META-INF'))
     }
 
-    project.task('buildStandaloneWar', dependsOn: project.extractDependencies) << {
+    project.task('standaloneWar',
+                 dependsOn: project.extractDependencies,
+                 description: "Creates a war using the war task and repackages it with an embedded servlet container.") << {
       outWar = "build/$standaloneWarName"
 
       project.ant.unzip(src: warFile, dest: warDir)
