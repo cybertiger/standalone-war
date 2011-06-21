@@ -11,14 +11,59 @@ dependencies {
   groovy localGroovy()
   compile group: 'commons-io', name: 'commons-io', version: '1.4'
   compile group: 'log4j', name: 'log4j', version: '1.2.15', ext: 'jar'
+  compile 'org.mortbay.jetty:jetty-embedded:6.1.21'
+  compile 'org.mortbay.jetty:jetty-naming:6.1.21'
+  compile 'org.mortbay.jetty:jetty-plus:6.1.21'
+  compile 'org.mortbay.jetty:jsp-2.1:6.1.10'
+
 }
 
 class StandaloneWarPlugin implements Plugin<Project> { 
-  def void apply(Project project) { 
-    project.task('standaloneWar', dependsOn: 'war') << {
-      println project.war.archivePath
-      // 2. get hold of starter class and jetty dependencies
-      // 3. repackage the war
+
+  def extractDependencies(Project project, depsDir) { 
+    for(file in project.configurations.compile) {
+      project.ant.unzip(src: file.absolutePath,
+                dest: depsDir)
     }
+    project.ant.delete(dir: new File(depsDir, 'META-INF'))
+  }
+
+
+  def void apply(Project project) {
+    def warFile = project.war.archivePath
+    def standaloneWarName = project.name + '-standalone.war'
+    def depsDir = project.file('build/dependencies')
+    def outDir = project.file('build/out')
+    def warDir = project.file('build/explodedWar')
+
+    project.task('extractDependencies', dependsOn: ':starter:jar') << {
+      for(file in project.configurations.compile) {
+        project.ant.unzip(src: file.absolutePath,
+                  dest: depsDir)
+      }
+	
+      project.ant.delete(dir: new File(depsDir, 'META-INF'))
+    }
+
+    project.task('buildStandaloneWar', dependsOn: project.extractDependencies) << {
+      outWar = "build/$standaloneWarName"
+
+      project.ant.unzip(src: warFile, dest: warDir)
+	
+      project.copy {
+        from depsDir
+        from outDir
+        into warDir
+      }
+
+      project.ant.manifest(file: new File(warDir, 'META-INF/MANIFEST.MF')) {
+        attribute(name: 'Main-Class', value: 'com.xlson.standalonewar.Starter')
+      }
+
+      project.ant.zip(destfile: "$outWar") {
+        fileset(dir: warDir)
+      }
+    }
+
   }
 }
