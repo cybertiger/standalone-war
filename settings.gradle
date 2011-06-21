@@ -1,1 +1,1 @@
-include 'starter', 'standaloneify'
+include 'starter', 'standaloneify', 'standalone-gradle'
