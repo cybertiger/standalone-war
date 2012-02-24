@@ -26,9 +26,7 @@ repositories {
 
 dependencies {
   standalone project(':starter')
-  standalone 'org.mortbay.jetty:jetty-embedded:6.1.21'
-  standalone 'org.mortbay.jetty:jetty-naming:6.1.21'
-  standalone 'org.mortbay.jetty:jetty-plus:6.1.21'
+  standalone 'org.eclipse.jetty.aggregate:jetty-server:7.3.1.v20110307'
 }
 
 defaultTasks 'buildStandaloneWar'
