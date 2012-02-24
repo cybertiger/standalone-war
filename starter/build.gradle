@@ -5,5 +5,5 @@ repositories {
 }
 
 dependencies {
-	compile 'org.mortbay.jetty:jetty-embedded:6.1.21'
+        compile 'org.eclipse.jetty.aggregate:jetty-server:7.3.1.v20110307'
 }
