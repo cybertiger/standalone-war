@@ -55,7 +55,7 @@ public class Starter {
 
     WebAppContext context = new WebAppContext();
     context.setServer(server);
-    context.setContextPath("/");
+    context.setContextPath(System.getProperty("app.context", "/"));
 
     ProtectionDomain protectionDomain = Starter.class.getProtectionDomain();
     URL location = protectionDomain.getCodeSource().getLocation();
