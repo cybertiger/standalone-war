@@ -9,7 +9,7 @@ standalone-war is a [Gradle](http://gradle.org/) build that will help you repack
 ### Prerequisites & Setup
 
 1. Download and install Gradle 0.8 or later (instructions [here](http://gradle.org/installation.html))
-2. Download `build.gradle` from [GitHub](https://github.com/xlson/standalone-war/raw/master/build.gradle) and put it into your directory of choice
+2. Download `build.gradle` from [GitHub](https://github.com/xlson/standalone-war/blob/master/standaloneify/build.gradle) and put it into your directory of choice
 
 ### Usage
 
